@@ -649,6 +649,25 @@
 // Format : https://tbb-sepa.TONCOMPTE.workers.dev/send
 const WORKER_URL = 'https://tbb-sepa.factures.workers.dev/send';
 
+// ── RUM generator ─────────────────────────────────────────────────────────────
+let currentRUM = '';
+function generateRUM(companyName) {
+  const prefix = (companyName || '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(0, 3)
+    .padEnd(3, 'X');
+  const ts = Date.now().toString(36).toUpperCase();
+  const rand = Math.random().toString(36).slice(2, 5).toUpperCase();
+  return `TBB-${prefix}-${ts}${rand}`;
+}
+
+function updateRUM() {
+  const company = document.getElementById('company').value.trim();
+  currentRUM = generateRUM(company);
+  document.getElementById('rumDisplay').textContent = currentRUM;
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 (function init() {
   // Default start date = today + 10 days
@@ -677,25 +696,6 @@ const WORKER_URL = 'https://tbb-sepa.factures.workers.dev/send';
   document.getElementById('company').addEventListener('input', updateRUM);
   updateRUM();
 })();
-
-// ── RUM generator ─────────────────────────────────────────────────────────────
-let currentRUM = '';
-function generateRUM(companyName) {
-  const prefix = (companyName || '')
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '')
-    .slice(0, 3)
-    .padEnd(3, 'X');
-  const ts = Date.now().toString(36).toUpperCase();
-  const rand = Math.random().toString(36).slice(2, 5).toUpperCase();
-  return `TBB-${prefix}-${ts}${rand}`;
-}
-
-function updateRUM() {
-  const company = document.getElementById('company').value.trim();
-  currentRUM = generateRUM(company);
-  document.getElementById('rumDisplay').textContent = currentRUM;
-}
 
 // ── Collect form data ─────────────────────────────────────────────────────────
 function getIBAN() {
