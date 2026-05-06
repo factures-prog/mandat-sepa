@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mandat de prélèvement SEPA — Ten Belles Bread</title>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --ink:     #18180F;
+    --ink-mid: #6B6B5E;
+    --ink-lt:  #AEADA5;
+    --cream:   #F7F5F0;
+    --cream-dk:#EDEBE4;
+    --border:  #DDDBD3;
+    --border-dk:#BFBDB5;
+    --danger:  #C0392B;
+    --success: #1A7A4A;
+    --r:       6px;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body:    'DM Sans', system-ui, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { background: var(--cream); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+
+  body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2.5rem 1rem 5rem; }
+
+  /* ── Page shell ── */
+  .page {
+    width: 100%;
+    max-width: 680px;
+  }
+
+  /* ── Header ── */
+  .site-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-block {
+    width: 52px; height: 52px;
+    background: var(--ink);
+    border-radius: 8px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 0; flex-shrink: 0;
+  }
+  .logo-block .l1 { color: #F7F5F0; font-family: var(--font-body); font-weight: 500; font-size: 9.5px; letter-spacing: .5px; line-height: 1; margin-bottom: 1px; }
+  .logo-block .l2 { color: #F7F5F0; font-family: var(--font-display); font-weight: 300; font-size: 9px; line-height: 1; }
+  .logo-block .l3 { color: #F7F5F0; font-family: var(--font-body); font-size: 5.5px; letter-spacing: 2.5px; line-height: 1; margin-top: 2px; }
+
+  .header-text {}
+  .header-text h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 26px;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+  .header-text p {
+    font-size: 11px;
+    color: var(--ink-mid);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  /* ── RUM badge ── */
+  .rum-badge {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    background: var(--cream-dk);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: .625rem 1rem;
+    margin-bottom: 2rem;
+    font-size: 12px;
+  }
+  .rum-badge .rum-label { color: var(--ink-mid); white-space: nowrap; }
+  .rum-badge .rum-value {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: .04em;
+    flex: 1;
+  }
+  .rum-badge .rum-hint { font-size: 10.5px; color: var(--ink-lt); font-style: italic; }
+
+  /* ── Legal box ── */
+  .legal-notice {
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 1rem 1.125rem;
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem 2rem;
+  }
+  @media (max-width: 520px) { .legal-notice { grid-template-columns: 1fr; } }
+  .legal-text {
+    font-size: 11.5px;
+    color: var(--ink-mid);
+    line-height: 1.7;
+  }
+  .legal-meta {
+    border-left: 1px solid var(--border);
+    padding-left: 1.25rem;
+    min-width: 160px;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    gap: .625rem;
+  }
+  @media (max-width: 520px) { .legal-meta { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: .875rem; } }
+  .meta-item .mi-label { font-size: 10px; color: var(--ink-lt); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 2px; }
+  .meta-item .mi-value { font-weight: 500; font-size: 12px; color: var(--ink); line-height: 1.3; }
+
+  /* ── Creditor block ── */
+  .creditor-block {
+    background: var(--cream-dk);
+    border-radius: var(--r);
+    border: 1px solid var(--border);
+    padding: .875rem 1rem;
+    margin-bottom: 2rem;
+    font-size: 12px;
+  }
+  .creditor-block h3 {
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-mid);
+    margin-bottom: .75rem;
+  }
+  .creditor-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: .5rem 1.5rem;
+  }
+  @media (max-width: 480px) { .creditor-grid { grid-template-columns: 1fr 1fr; } }
+  .cg-item .cg-l { font-size: 10px; color: var(--ink-lt); margin-bottom: 1px; }
+  .cg-item .cg-v { font-weight: 500; font-size: 12px; line-height: 1.3; }
+
+  /* ── Section title ── */
+  .section-title {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-mid);
+    margin: 2rem 0 1rem;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .section-title::before {
+    content: '';
+    display: inline-block;
+    width: 16px; height: 1px;
+    background: var(--ink-mid);
+  }
+
+  /* ── Fields ── */
+  .field { margin-bottom: 1.125rem; }
+  .field label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-mid);
+    margin-bottom: 5px;
+  }
+  .field label .req { color: var(--danger); font-size: 10px; }
+  .field input, .field select {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--border-dk);
+    border-radius: var(--r);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+    appearance: none;
+  }
+  .field input:focus {
+    border-color: var(--ink);
+    box-shadow: 0 0 0 3px rgba(24,24,15,.07);
+  }
+  .field input.has-error { border-color: var(--danger); }
+  .field-error {
+    font-size: 11px;
+    color: var(--danger);
+    margin-top: 4px;
+    display: none;
+  }
+  .field-error.show { display: block; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 .875rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 .875rem; }
+  @media (max-width: 480px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  /* ── IBAN ── */
+  .iban-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-mid);
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .iban-label .req { color: var(--danger); font-size: 10px; }
+  .iban-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: .25rem;
+  }
+  .iban-grid input {
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    padding: 0 3px;
+    letter-spacing: .04em;
+    height: 40px;
+    background: #fff;
+    border: 1px solid var(--border-dk);
+    border-radius: var(--r);
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s;
+    width: 100%;
+  }
+  .iban-grid input:focus { border-color: var(--ink); }
+  .iban-grid input.has-error { border-color: var(--danger); }
+  @media (max-width: 440px) {
+    .iban-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  /* ── Payment info ── */
+  .payment-info {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    background: var(--cream-dk);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: .875rem 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .pi-item .pi-l { font-size: 10px; color: var(--ink-lt); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 2px; }
+  .pi-item .pi-v { font-size: 13px; font-weight: 500; }
+
+  /* ── Submit area ── */
+  .submit-area { margin-top: 2rem; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 48px;
+    padding: 0 1.5rem;
+    border-radius: var(--r);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: opacity .15s, transform .1s;
+    text-decoration: none;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  .btn-primary {
+    background: var(--ink);
+    color: var(--cream);
+    width: 100%;
+  }
+  .btn-primary:hover:not(:disabled) { opacity: .85; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--border-dk);
+    width: 100%;
+    margin-bottom: .75rem;
+  }
+  .btn-ghost:hover:not(:disabled) { background: var(--cream-dk); }
+
+  .submit-note {
+    font-size: 11px;
+    color: var(--ink-lt);
+    text-align: center;
+    margin-top: .875rem;
+    line-height: 1.65;
+  }
+
+  /* ── Spinner ── */
+  .spinner {
+    width: 17px; height: 17px;
+    border: 2px solid rgba(247,245,240,.3);
+    border-top-color: #F7F5F0;
+    border-radius: 50%;
+    animation: spin .65s linear infinite;
+    display: none;
+  }
+  .btn-primary.loading .spinner { display: block; }
+  .btn-primary.loading .btn-txt { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Preview pane ── */
+  .preview-pane {
+    margin-top: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+    display: none;
+  }
+  .preview-pane.open { display: block; }
+  .preview-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .625rem 1rem;
+    background: var(--cream-dk);
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--ink-mid);
+  }
+  .preview-bar button {
+    font-size: 12px;
+    padding: 3px 10px;
+    border: 1px solid var(--border-dk);
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .preview-pane iframe { width: 100%; height: 520px; border: none; display: block; }
+
+  /* ── Success screen ── */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+  .success-screen.open { display: block; }
+  .success-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: #E8F5EE;
+    border: 1.5px solid #A8D5B9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    font-size: 22px;
+    color: var(--success);
+  }
+  .success-screen h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 26px;
+    margin-bottom: .5rem;
+  }
+  .success-screen p {
+    font-size: 13px;
+    color: var(--ink-mid);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .dl-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border: 1px solid var(--border-dk);
+    border-radius: var(--r);
+    font-size: 13px;
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--cream-dk);
+    cursor: pointer;
+    text-decoration: none;
+    margin-bottom: 1rem;
+  }
+  .dl-btn:hover { background: var(--cream); }
+  .reset-link {
+    display: block;
+    margin-top: .75rem;
+    font-size: 12px;
+    color: var(--ink-mid);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  /* ── Error screen ── */
+  .error-banner {
+    display: none;
+    background: #FDF3F3;
+    border: 1px solid #F5C6C6;
+    border-radius: var(--r);
+    padding: .875rem 1rem;
+    margin-top: 1rem;
+    font-size: 12.5px;
+    color: var(--danger);
+    line-height: 1.6;
+  }
+  .error-banner.show { display: block; }
+
+  /* ── Footer ── */
+  .page-footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--ink-lt);
+    text-align: center;
+    line-height: 1.8;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="logo-block">
+      <span class="l1">10</span>
+      <span class="l2">Belles</span>
+      <span class="l3">BREAD</span>
+    </div>
+    <div class="header-text">
+      <h1>Mandat de prélèvement SEPA</h1>
+      <p>Ten Belles Bread · Wholesale</p>
+    </div>
+  </header>
+
+  <div id="mainForm">
+
+    <!-- RUM auto-generated -->
+    <div class="rum-badge">
+      <span class="rum-label">Référence unique (RUM)</span>
+      <span class="rum-value" id="rumDisplay">TBB-???-…</span>
+      <span class="rum-hint">Générée automatiquement</span>
+    </div>
+
+    <!-- Legal notice -->
+    <div class="legal-notice">
+      <div class="legal-text">
+        En signant ce formulaire, vous autorisez <strong>(A)</strong> Ten Belles Bread SAS à envoyer des instructions à votre banque pour débiter votre compte et <strong>(B)</strong> votre banque à débiter votre compte conformément aux instructions de Ten Belles Bread SAS. Vous bénéficiez du droit d'être remboursé par votre banque selon les conditions décrites dans la convention que vous avez conclue avec elle.<br/><br/>
+        Une demande de remboursement doit être présentée <em>dans les 8 semaines</em> suivant la date de débit pour un prélèvement autorisé ; sans tarder et au plus tard <em>dans les 13 mois</em> en cas de prélèvement non autorisé.
+      </div>
+      <div class="legal-meta">
+        <div class="meta-item">
+          <div class="mi-label">Identifiant créancier SEPA</div>
+          <div class="mi-value">FR15ZZZ837AAA</div>
+        </div>
+        <div class="meta-item">
+          <div class="mi-label">Créancier</div>
+          <div class="mi-value">Ten Belles Bread SAS</div>
+        </div>
+        <div class="meta-item">
+          <div class="mi-label">Adresse</div>
+          <div class="mi-value">17-19 bis rue Bréguet<br/>75011 Paris</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Creditor info block -->
+    <div class="creditor-block">
+      <h3>Informations du créancier</h3>
+      <div class="creditor-grid">
+        <div class="cg-item"><div class="cg-l">Raison sociale</div><div class="cg-v">SAS Ten Belles Bread</div></div>
+        <div class="cg-item"><div class="cg-l">SIRET</div><div class="cg-v">817 488 943 00025</div></div>
+        <div class="cg-item"><div class="cg-l">N° TVA intracommunautaire</div><div class="cg-v">FR30817488943</div></div>
+        <div class="cg-item"><div class="cg-l">Adresse</div><div class="cg-v">17-19 bis rue Bréguet, 75011 Paris</div></div>
+        <div class="cg-item"><div class="cg-l">Type de prélèvement</div><div class="cg-v">Récurrent / répétitif</div></div>
+        <div class="cg-item"><div class="cg-l">Échéance</div><div class="cg-v">Mensuel — J+10 facture</div></div>
+      </div>
+    </div>
+
+    <!-- Section: Client -->
+    <div class="section-title">Vos coordonnées</div>
+
+    <div class="field">
+      <label>Raison sociale <span class="req">obligatoire</span></label>
+      <input type="text" id="company" placeholder="Ex : Café du Marché SAS" autocomplete="organization"/>
+      <div class="field-error" id="e-company">Ce champ est obligatoire</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label>Prénom du signataire <span class="req">obligatoire</span></label>
+        <input type="text" id="firstName" placeholder="Marie" autocomplete="given-name"/>
+        <div class="field-error" id="e-firstName">Ce champ est obligatoire</div>
+      </div>
+      <div class="field">
+        <label>Nom du signataire <span class="req">obligatoire</span></label>
+        <input type="text" id="lastName" placeholder="Dupont" autocomplete="family-name"/>
+        <div class="field-error" id="e-lastName">Ce champ est obligatoire</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Email du signataire <span class="req">obligatoire</span></label>
+      <input type="email" id="email" placeholder="contact@votreentreprise.fr" autocomplete="email"/>
+      <div class="field-error" id="e-email">Email valide requis</div>
+    </div>
+
+    <div class="field">
+      <label>Adresse</label>
+      <input type="text" id="address" placeholder="12 rue de la Paix" autocomplete="street-address"/>
+    </div>
+
+    <div class="grid-3">
+      <div class="field">
+        <label>Code postal</label>
+        <input type="text" id="postal" placeholder="75001" autocomplete="postal-code" inputmode="numeric" maxlength="10"/>
+      </div>
+      <div class="field" style="grid-column: span 2">
+        <label>Ville</label>
+        <input type="text" id="city" placeholder="Paris" autocomplete="address-level2"/>
+      </div>
+    </div>
+
+    <div class="field" style="max-width: 240px">
+      <label>Pays</label>
+      <input type="text" id="country" value="France" autocomplete="country-name"/>
+    </div>
+
+    <!-- Section: Banque -->
+    <div class="section-title">Coordonnées bancaires</div>
+
+    <div class="iban-label">IBAN <span class="req">obligatoire</span></div>
+    <div class="iban-grid">
+      <input id="ib1" maxlength="4" placeholder="FR76" aria-label="IBAN partie 1"/>
+      <input id="ib2" maxlength="4" placeholder="3000" aria-label="IBAN partie 2"/>
+      <input id="ib3" maxlength="4" placeholder="6000" aria-label="IBAN partie 3"/>
+      <input id="ib4" maxlength="4" placeholder="0001" aria-label="IBAN partie 4"/>
+      <input id="ib5" maxlength="4" placeholder="2345" aria-label="IBAN partie 5"/>
+      <input id="ib6" maxlength="4" placeholder="6789" aria-label="IBAN partie 6"/>
+      <input id="ib7" maxlength="3" placeholder="012"  aria-label="IBAN partie 7"/>
+    </div>
+    <div class="field-error" id="e-iban">IBAN invalide ou incomplet (minimum 15 caractères)</div>
+
+    <div class="field" style="margin-top: 1rem; max-width: 260px">
+      <label>BIC / SWIFT <span class="req">obligatoire</span></label>
+      <input type="text" id="bic" placeholder="BNPAFRPP" style="text-transform:uppercase; font-family: 'Courier New', monospace; letter-spacing:.04em"/>
+      <div class="field-error" id="e-bic">BIC requis</div>
+    </div>
+
+    <!-- Payment meta -->
+    <div class="payment-info">
+      <div class="pi-item">
+        <div class="pi-l">Type de paiement</div>
+        <div class="pi-v">Récurrent / répétitif</div>
+      </div>
+      <div class="pi-item">
+        <div class="pi-l">Fréquence</div>
+        <div class="pi-v">Mensuel</div>
+      </div>
+      <div class="pi-item">
+        <div class="pi-l">Échéance</div>
+        <div class="pi-v">10 j. après réception facture</div>
+      </div>
+    </div>
+
+    <div class="field" style="max-width: 240px">
+      <label>Date de démarrage souhaitée</label>
+      <input type="date" id="startDate"/>
+    </div>
+
+    <!-- Submit -->
+    <div class="submit-area">
+      <button class="btn btn-ghost" onclick="previewPDF()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Prévisualiser le mandat PDF
+      </button>
+      <button class="btn btn-primary" id="submitBtn" onclick="handleSubmit()">
+        <div class="spinner"></div>
+        <span class="btn-txt">Envoyer pour signature électronique →</span>
+      </button>
+      <p class="submit-note">
+        En cliquant, un email GoodSign sera envoyé au client avec le lien de signature.<br/>
+        factures@tenbelles.com sera en copie. Merci de joindre un RIB.
+      </p>
+      <div class="error-banner" id="errorBanner"></div>
+    </div>
+
+    <!-- PDF Preview -->
+    <div class="preview-pane" id="previewPane">
+      <div class="preview-bar">
+        <span>Aperçu du mandat SEPA</span>
+        <button onclick="closePreview()">Fermer ✕</button>
+      </div>
+      <iframe id="previewFrame" title="Aperçu PDF"></iframe>
+    </div>
+
+  </div><!-- /mainForm -->
+
+  <!-- Success -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✓</div>
+    <h2>Mandat envoyé !</h2>
+    <p id="successText">Un email de signature électronique a été envoyé à l'adresse indiquée. Le client peut signer directement depuis son email.</p>
+    <a class="dl-btn" id="dlBtn" download="Mandat_SEPA_TenBelles.pdf">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Télécharger le PDF
+    </a>
+    <span class="reset-link" onclick="resetForm()">← Créer un nouveau mandat</span>
+  </div>
+
+  <footer class="page-footer">
+    SAS Ten Belles Bread · 17-19 bis rue Bréguet 75011 Paris · SIRET 817 488 943 00025 · TVA FR30817488943<br/>
+    Identifiant créancier SEPA : FR15ZZZ837AAA · Signature électronique via GoodSign
+  </footer>
+
+</div><!-- /page -->
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────────────
+// URL du Cloudflare Worker (à mettre à jour après déploiement)
+// Format : https://tbb-sepa.TONCOMPTE.workers.dev/send
+const WORKER_URL = 'https://tbb-sepa.factures.workers.dev/send';
+
+// ── RUM generator ─────────────────────────────────────────────────────────────
+let currentRUM = '';
+function generateRUM(companyName) {
+  const prefix = (companyName || '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(0, 3)
+    .padEnd(3, 'X');
+  const ts = Date.now().toString(36).toUpperCase();
+  const rand = Math.random().toString(36).slice(2, 5).toUpperCase();
+  return `TBB-${prefix}-${ts}${rand}`;
+}
+
+function updateRUM() {
+  const company = document.getElementById('company').value.trim();
+  currentRUM = generateRUM(company);
+  document.getElementById('rumDisplay').textContent = currentRUM;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+(function init() {
+  // Default start date = today + 10 days
+  const d = new Date();
+  d.setDate(d.getDate() + 10);
+  document.getElementById('startDate').value = d.toISOString().split('T')[0];
+
+  // IBAN auto-advance
+  document.querySelectorAll('.iban-grid input').forEach((inp, i, arr) => {
+    inp.addEventListener('input', () => {
+      inp.value = inp.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if (inp.value.length >= parseInt(inp.maxLength) && i < arr.length - 1) arr[i+1].focus();
+      updateRUM();
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && inp.value === '' && i > 0) arr[i-1].focus();
+    });
+  });
+
+  // BIC uppercase
+  document.getElementById('bic').addEventListener('input', e => {
+    e.target.value = e.target.value.toUpperCase();
+  });
+
+  // RUM updates when company name changes
+  document.getElementById('company').addEventListener('input', updateRUM);
+  updateRUM();
+})();
+
+// ── Collect form data ─────────────────────────────────────────────────────────
+function getIBAN() {
+  return ['ib1','ib2','ib3','ib4','ib5','ib6','ib7']
+    .map(id => document.getElementById(id).value.trim())
+    .join('');
+}
+
+function formData() {
+  return {
+    company:   document.getElementById('company').value.trim(),
+    firstName: document.getElementById('firstName').value.trim(),
+    lastName:  document.getElementById('lastName').value.trim(),
+    email:     document.getElementById('email').value.trim(),
+    address:   document.getElementById('address').value.trim(),
+    postal:    document.getElementById('postal').value.trim(),
+    city:      document.getElementById('city').value.trim(),
+    country:   document.getElementById('country').value.trim() || 'France',
+    iban:      getIBAN(),
+    bic:       document.getElementById('bic').value.trim().toUpperCase(),
+    startDate: document.getElementById('startDate').value,
+    rum:       currentRUM,
+  };
+}
+
+// ── Validation ─────────────────────────────────────────────────────────────────
+function validate() {
+  let ok = true;
+  const reqFields = ['company', 'firstName', 'lastName', 'email'];
+  reqFields.forEach(id => {
+    const v   = document.getElementById(id).value.trim();
+    const el  = document.getElementById(id);
+    const err = document.getElementById('e-' + id);
+    if (!v) { err.classList.add('show'); el.classList.add('has-error'); ok = false; }
+    else    { err.classList.remove('show'); el.classList.remove('has-error'); }
+  });
+  // Email format
+  const emailEl = document.getElementById('email');
+  if (emailEl.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value)) {
+    document.getElementById('e-email').classList.add('show');
+    emailEl.classList.add('has-error');
+    ok = false;
+  }
+  // IBAN
+  const iban = getIBAN();
+  const ibanErr = document.getElementById('e-iban');
+  if (iban.length < 15) { ibanErr.classList.add('show'); ok = false; }
+  else ibanErr.classList.remove('show');
+  // BIC
+  const bic    = document.getElementById('bic').value.trim();
+  const bicErr = document.getElementById('e-bic');
+  if (!bic) { bicErr.classList.add('show'); ok = false; }
+  else bicErr.classList.remove('show');
+  return ok;
+}
+
+// ── PDF generation (pdf-lib) ──────────────────────────────────────────────────
+async function buildPDF(d) {
+  const { PDFDocument, rgb, StandardFonts, PageSizes } = PDFLib;
+
+  const doc  = await PDFDocument.create();
+  const page = doc.addPage(PageSizes.A4);
+  const { width: W, height: H } = page.getSize();
+
+  const fR  = await doc.embedFont(StandardFonts.Helvetica);
+  const fB  = await doc.embedFont(StandardFonts.HelveticaBold);
+  const fI  = await doc.embedFont(StandardFonts.HelveticaOblique);
+  const fMono = await doc.embedFont(StandardFonts.Courier);
+  const fMonoB= await doc.embedFont(StandardFonts.CourierBold);
+
+  const INK   = rgb(0.094, 0.094, 0.059);
+  const GRAY  = rgb(0.42,  0.42,  0.37);
+  const LGRAY = rgb(0.74,  0.74,  0.71);
+  const OFFWH = rgb(0.969, 0.961, 0.941);
+  const CREAM = rgb(0.929, 0.922, 0.894);
+  const WHITE = rgb(1, 1, 1);
+
+  const ML = 22, MR = W - 22;
+  const COL_W = MR - ML;
+
+  function hline(y, w = 0.4, col = LGRAY) {
+    page.drawLine({ start:{x:ML,y}, end:{x:MR,y}, thickness:w, color:col });
+  }
+
+  function txt(text, x, y, size, font, color) {
+    if (!text) return;
+    page.drawText(String(text), {x, y, size, font, color});
+  }
+
+  function fieldBlock(label, value, x, y, colW) {
+    txt(label.toUpperCase(), x, y + 8.5, 5.5, fR, GRAY);
+    txt(value || '', x, y, 8, fB, INK);
+  }
+
+  // ── Logo ────────────────────────────────────────────────────────────────────
+  const LS = 50, LY = H - 16 - LS;
+  page.drawRectangle({x: ML, y: LY, width: LS, height: LS, color: INK, borderRadius: 4});
+  txt('10',    ML+16, LY+LS-14, 10, fB, OFFWH);
+  txt('Belles',ML+9,  LY+LS-23, 8,  fR, OFFWH);
+  txt('BREAD', ML+12, LY+LS-32, 5.5,fR, OFFWH);
+
+  // ── Title ────────────────────────────────────────────────────────────────────
+  const TX = ML + LS + 9;
+  txt('Mandat de prélèvement SEPA', TX, H-24, 18, fR, INK);
+  txt('TEN BELLES BREAD  ·  WHOLESALE', TX, H-35, 7, fR, GRAY);
+
+  let y = LY - 10;
+  hline(y, 0.5, INK);
+
+  // ── Legal block ──────────────────────────────────────────────────────────────
+  y -= 5;
+  const BH = 82, BW = COL_W;
+  page.drawRectangle({x:ML, y:y-BH, width:BW, height:BH, color:OFFWH, borderColor:LGRAY, borderWidth:0.5, borderRadius:4});
+
+  const legalLines = [
+    'En signant ce formulaire, vous autorisez (A) Ten Belles Bread SAS à envoyer des instructions à votre banque pour',
+    "débiter votre compte et (B) votre banque à débiter votre compte conformément aux instructions de Ten Belles Bread SAS.",
+    "Vous bénéficiez du droit d'être remboursé par votre banque selon les conditions décrites dans la convention conclue",
+    "avec elle. Remboursement : dans les 8 semaines pour un prélèvement autorisé ; au plus tard dans les 13 mois pour",
+    "un prélèvement non autorisé."
+  ];
+  legalLines.forEach((line, i) => txt(line, ML+5, y-7-(i*8.5), 6.3, fR, INK));
+
+  // Right: creditor meta
+  const RX = ML + BW * 0.58;
+  [
+    {l:'Identifiant créancier SEPA', v:'FR15ZZZ837AAA'},
+    {l:'Référence unique (RUM)',      v:d.rum},
+    {l:'Créancier',                   v:'TEN BELLES BREAD SAS'},
+    {l:'Adresse',                     v:'17-19 bis rue Bréguet, 75011 Paris'},
+    {l:'SIRET',                       v:'817 488 943 00025'},
+    {l:'TVA',                         v:'FR30817488943'},
+  ].forEach(({l,v}, i) => {
+    txt(l+':', RX, y-6-(i*13), 5.5, fR, GRAY);
+    txt(v,     RX, y-13-(i*13), 7.5, fB, INK);
+  });
+
+  y -= BH + 12;
+
+  // ── Section helper ───────────────────────────────────────────────────────────
+  function section(label, yy) {
+    txt(label, ML, yy, 6.5, fB, GRAY);
+    page.drawLine({start:{x:ML,y:yy-4},end:{x:MR,y:yy-4},thickness:0.3,color:LGRAY});
+  }
+
+  // ── Debtor coords ────────────────────────────────────────────────────────────
+  section('VOS COORDONNÉES', y); y -= 13;
+  fieldBlock('Raison sociale', d.company,   ML,       y, 155);
+  fieldBlock('Signataire',     d.firstName+' '+d.lastName, ML+155, y, 155);
+  y -= 18;
+  fieldBlock('Adresse',        d.address,   ML,       y, 155);
+  fieldBlock('Code postal / Ville', (d.postal+' '+d.city).trim(), ML+155, y, 155);
+  y -= 18;
+  fieldBlock('Pays',           d.country,   ML,       y, 100);
+  y -= 22;
+
+  // ── Banking ──────────────────────────────────────────────────────────────────
+  hline(y+4, 0.3);
+  section('COORDONNÉES BANCAIRES', y); y -= 12;
+
+  txt("IBAN — Numéro d'identification international du compte bancaire", ML, y+2, 6.3, fR, GRAY);
+  const ibanRaw = (d.iban||'').replace(/\s/g,'');
+  const chunks  = [];
+  for (let i=0; i<28; i+=4) chunks.push(ibanRaw.slice(i,i+4));
+  while (chunks.length < 7) chunks.push('');
+  const boxW = (COL_W - 18) / 7;
+  y -= 18;
+  chunks.slice(0,7).forEach((ch, i) => {
+    const bx = ML + i*(boxW+3);
+    page.drawRectangle({x:bx, y:y-15, width:boxW, height:15, color:WHITE, borderColor:LGRAY, borderWidth:0.5, borderRadius:2});
+    if (ch) txt(ch, bx+(boxW-fMonoB.widthOfTextAtSize(ch,8))/2, y-10, 8, fMonoB, INK);
+  });
+  y -= 26;
+
+  txt("BIC — Code international d'identification de votre banque", ML, y+2, 6.3, fR, GRAY);
+  const bicChars = [...(d.bic||'').padEnd(11,' ')].slice(0,11);
+  const bw2 = 14.5;
+  y -= 18;
+  bicChars.forEach((ch, i) => {
+    const bx = ML + i*(bw2+1.5);
+    page.drawRectangle({x:bx, y:y-14, width:bw2, height:14, color:WHITE, borderColor:LGRAY, borderWidth:0.5, borderRadius:2});
+    if (ch.trim()) txt(ch.trim(), bx+(bw2-fMonoB.widthOfTextAtSize(ch.trim(),9))/2, y-10, 9, fMonoB, INK);
+  });
+  y -= 22;
+
+  // ── Payment / RUM info ────────────────────────────────────────────────────────
+  hline(y+4, 0.3);
+  y -= 4;
+  txt("Merci de retourner ce formulaire accompagné d'un relevé d'identité bancaire (RIB).", ML, y, 7, fI, GRAY);
+  y -= 11;
+  [
+    ['Type de paiement', 'Récurrent / répétitif'],
+    ['Échéance', 'Mensuel — 10 jours après réception de la facture'],
+    ['Date de démarrage souhaitée', d.startDate || ''],
+    ['Référence unique du mandat (RUM)', d.rum],
+  ].forEach(([lbl,val]) => {
+    txt(lbl+' :', ML, y, 7, fR, GRAY);
+    txt(val, ML+130, y, 7.5, fB, INK);
+    y -= 10.5;
+  });
+  y -= 6;
+
+  // ── Signature block ───────────────────────────────────────────────────────────
+  hline(y+4, 0.3);
+  y -= 5;
+  const sigW = (COL_W - 16) / 3;
+  ['Signé à', 'Date', 'Signature(s) et tampon'].forEach((lbl, i) => {
+    const sx = ML + i*(sigW+8);
+    txt(lbl, sx, y, 6.5, fR, GRAY);
+    page.drawRectangle({x:sx, y:y-38, width:sigW, height:36, color:WHITE, borderColor:LGRAY, borderWidth:0.4, borderRadius:3});
+  });
+
+  // ── Footer ────────────────────────────────────────────────────────────────────
+  hline(22, 0.6, INK);
+  txt('SAS TEN BELLES BREAD  ·  17-19 bis rue Bréguet, 75011 Paris', ML, 14, 6.3, fR, GRAY);
+  txt('SIRET 817 488 943 00025  ·  TVA FR30817488943  ·  Créancier SEPA : FR15ZZZ837AAA', ML, 9, 6, fR, LGRAY);
+  const note = 'Document généré électroniquement — GoodSign';
+  txt(note, MR - fR.widthOfTextAtSize(note,6), 9, 6, fR, LGRAY);
+
+  return await doc.save();
+}
+
+// ── Preview ───────────────────────────────────────────────────────────────────
+async function previewPDF() {
+  const d = formData();
+  const pdfBytes = await buildPDF(d);
+  const blob = new Blob([pdfBytes], {type:'application/pdf'});
+  const url  = URL.createObjectURL(blob);
+  document.getElementById('previewFrame').src = url;
+  const pane = document.getElementById('previewPane');
+  pane.classList.add('open');
+  pane.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function closePreview() {
+  document.getElementById('previewPane').classList.remove('open');
+}
+
+// ── Submit → GoodSign ─────────────────────────────────────────────────────────
+async function handleSubmit() {
+  if (!validate()) { window.scrollTo({top:0,behavior:'smooth'}); return; }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.classList.add('loading');
+  document.getElementById('errorBanner').classList.remove('show');
+
+  const d = formData();
+  try {
+    const pdfBytes = await buildPDF(d);
+    const pdfBlob  = new Blob([pdfBytes], {type: 'application/pdf'});
+    const filename  = `Mandat_SEPA_${d.company.replace(/[^a-zA-Z0-9]/g,'_')}_${d.rum}.pdf`;
+
+    // GoodSign API : POST multipart/form-data vers /api/uploadpdf
+    // Le PDF est envoyé en fichier + le payload signers en JSON string
+    const signerPayload = JSON.stringify({
+      doc_name: filename,
+      email_subject: `Mandat SEPA — Ten Belles Bread · ${d.company}`,
+      email_message: `Bonjour ${d.firstName},\n\nVeuillez signer le mandat de prélèvement SEPA ci-joint pour Ten Belles Bread.\nRéférence : ${d.rum}\n\nMerci,\nTen Belles Bread`,
+      cc_email: 'factures@tenbelles.com',
+      duplicate: false,
+      signers: [{
+        key:          'signer1',
+        name:         `${d.firstName} ${d.lastName}`,
+        email:        d.email,
+        reminder_days: 3
+      }],
+      // Zone de signature positionnée dans le bloc signature en bas du PDF
+      extrafields: [{
+        key:    'signer1',
+        type:   'sign',
+        page:   1,
+        left:   '355',
+        top:    '720',
+        width:  '180',
+        height: '40'
+      }]
+    });
+
+    const formPayload = new FormData();
+    formPayload.append('file', pdfBlob, filename);
+    formPayload.append('payload', signerPayload);
+
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      body:   formPayload
+    });
+
+    const result = await res.json();
+    if (!res.ok || !result.success) {
+      throw new Error(result.message || result.error || JSON.stringify(result));
+    }
+
+    // Lien de téléchargement local
+    const url   = URL.createObjectURL(pdfBlob);
+    const dlBtn = document.getElementById('dlBtn');
+    dlBtn.href     = url;
+    dlBtn.download = filename;
+
+    document.getElementById('successText').textContent =
+      `Un email GoodSign a été envoyé à ${d.email} avec le lien de signature. factures@tenbelles.com est en copie. RUM : ${d.rum}`;
+
+    document.getElementById('mainForm').style.display = 'none';
+    document.getElementById('successScreen').classList.add('open');
+
+  } catch(err) {
+    const banner = document.getElementById('errorBanner');
+    banner.textContent = `Erreur : ${err.message}. Vérifiez votre clé API GoodSign dans la variable GOODSIGN_API_KEY.`;
+    banner.classList.add('show');
+  } finally {
+    btn.disabled = false; btn.classList.remove('loading');
+  }
+}
+
+// ── Reset ─────────────────────────────────────────────────────────────────────
+function resetForm() {
+  document.getElementById('successScreen').classList.remove('open');
+  document.getElementById('mainForm').style.display = 'block';
+  ['company','firstName','lastName','email','address','postal','city','bic'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  ['ib1','ib2','ib3','ib4','ib5','ib6','ib7'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('country').value = 'France';
+  const d = new Date(); d.setDate(d.getDate()+10);
+  document.getElementById('startDate').value = d.toISOString().split('T')[0];
+  updateRUM();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
