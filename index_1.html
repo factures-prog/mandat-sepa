@@ -1,5 +1,4 @@
-Here's the full file — copy everything between the lines:
-html<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
@@ -33,16 +32,12 @@ html<!DOCTYPE html>
     padding-bottom: 2rem; margin-bottom: 2rem;
     border-bottom: 1px solid var(--border);
   }
-  .logo-block {
+  .logo-img {
     width: 52px; height: 52px;
-    background: var(--ink); border-radius: 8px;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 0; flex-shrink: 0;
+    object-fit: contain;
+    flex-shrink: 0;
+    border-radius: 8px;
   }
-  .logo-block .l1 { color: #F7F5F0; font-family: var(--font-body); font-weight: 500; font-size: 9.5px; letter-spacing: .5px; line-height: 1; margin-bottom: 1px; }
-  .logo-block .l2 { color: #F7F5F0; font-family: var(--font-display); font-weight: 300; font-size: 9px; line-height: 1; }
-  .logo-block .l3 { color: #F7F5F0; font-family: var(--font-body); font-size: 5.5px; letter-spacing: 2.5px; line-height: 1; margin-top: 2px; }
   .header-text h1 {
     font-family: var(--font-display); font-weight: 400;
     font-size: 26px; letter-spacing: -0.01em;
@@ -232,11 +227,7 @@ html<!DOCTYPE html>
 <body>
 <div class="page">
   <header class="site-header">
-    <div class="logo-block">
-      <span class="l1">10</span>
-      <span class="l2">Belles</span>
-      <span class="l3">BREAD</span>
-    </div>
+    <img src="LogoPrincipalNoir.png" alt="Ten Belles Bread" class="logo-img"/>
     <div class="header-text">
       <h1>Mandat de prélèvement SEPA</h1>
       <p>Ten Belles Bread · Wholesale</p>
@@ -385,13 +376,9 @@ html<!DOCTYPE html>
   </footer>
 </div>
 <script>
-// ── State (TDZ-safe) ──────────────────────────────────────────────────────────
 const TBB = { currentRUM: '' };
-
-// ── Config ────────────────────────────────────────────────────────────────────
 const WORKER_URL = 'https://tbb-sepa.factures.workers.dev/send';
 
-// ── RUM generator ─────────────────────────────────────────────────────────────
 function generateRUM(companyName) {
   const prefix = (companyName || '')
     .toUpperCase()
@@ -410,7 +397,6 @@ function updateRUM() {
   display.textContent = TBB.currentRUM;
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
 function init() {
   const d = new Date();
   d.setDate(d.getDate() + 10);
@@ -443,7 +429,6 @@ if (document.readyState === 'loading') {
   init();
 }
 
-// ── Collect form data ─────────────────────────────────────────────────────────
 function getIBAN() {
   return ['ib1','ib2','ib3','ib4','ib5','ib6','ib7']
     .map(id => document.getElementById(id).value.trim())
@@ -465,7 +450,6 @@ function formData() {
     rum:       TBB.currentRUM,
   };
 }
-// ── Validation ─────────────────────────────────────────────────────────────────
 function validate() {
   let ok = true;
   const reqFields = ['company', 'firstName', 'lastName', 'email'];
@@ -492,7 +476,6 @@ function validate() {
   else bicErr.classList.remove('show');
   return ok;
 }
-// ── PDF generation (pdf-lib) ──────────────────────────────────────────────────
 async function buildPDF(d) {
   const { PDFDocument, rgb, StandardFonts, PageSizes } = PDFLib;
   const doc  = await PDFDocument.create();
@@ -520,39 +503,92 @@ async function buildPDF(d) {
     txt(label.toUpperCase(), x, y + 8.5, 5.5, fR, GRAY);
     txt(value || '', x, y, 8, fB, INK);
   }
+  // Logo (image with fallback to drawn tile)
   const LS = 50, LY = H - 16 - LS;
-  page.drawRectangle({x: ML, y: LY, width: LS, height: LS, color: INK, borderRadius: 4});
-  txt('10',    ML+16, LY+LS-14, 10, fB, OFFWH);
-  txt('Belles',ML+9,  LY+LS-23, 8,  fR, OFFWH);
-  txt('BREAD', ML+12, LY+LS-32, 5.5,fR, OFFWH);
+  try {
+    const logoBytes = await fetch('LogoPrincipalNoir.png').then(r => r.arrayBuffer());
+    const logoImg   = await doc.embedPng(logoBytes);
+    page.drawImage(logoImg, { x: ML, y: LY, width: LS, height: LS });
+  } catch(e) {
+    page.drawRectangle({x: ML, y: LY, width: LS, height: LS, color: INK, borderRadius: 4});
+    txt('10',    ML+16, LY+LS-14, 10, fB, OFFWH);
+    txt('Belles',ML+9,  LY+LS-23, 8,  fR, OFFWH);
+    txt('BREAD', ML+12, LY+LS-32, 5.5,fR, OFFWH);
+  }
   const TX = ML + LS + 9;
   txt('Mandat de prélèvement SEPA', TX, H-24, 18, fR, INK);
   txt('TEN BELLES BREAD  ·  WHOLESALE', TX, H-35, 7, fR, GRAY);
   let y = LY - 10;
   hline(y, 0.5, INK);
+  // Legal block (two-column with safe wrapping)
   y -= 5;
-  const BH = 82, BW = COL_W;
-  page.drawRectangle({x:ML, y:y-BH, width:BW, height:BH, color:OFFWH, borderColor:LGRAY, borderWidth:0.5, borderRadius:4});
-  const legalLines = [
-    'En signant ce formulaire, vous autorisez (A) Ten Belles Bread SAS à envoyer des instructions à votre banque pour',
-    "débiter votre compte et (B) votre banque à débiter votre compte conformément aux instructions de Ten Belles Bread SAS.",
-    "Vous bénéficiez du droit d'être remboursé par votre banque selon les conditions décrites dans la convention conclue",
-    "avec elle. Remboursement : dans les 8 semaines pour un prélèvement autorisé ; au plus tard dans les 13 mois pour",
-    "un prélèvement non autorisé."
-  ];
-  legalLines.forEach((line, i) => txt(line, ML+5, y-7-(i*8.5), 6.3, fR, INK));
-  const RX = ML + BW * 0.58;
-  [
+  const BW = COL_W;
+  const PAD       = 8;
+  const LEFT_X    = ML + PAD;
+  const LEFT_W    = BW * 0.56 - PAD * 1.5;
+  const DIV_X     = ML + BW * 0.58;
+  const RIGHT_X   = DIV_X + 6;
+  const RIGHT_W   = BW - (RIGHT_X - ML) - PAD;
+
+  function wrap(text, font, size, maxW) {
+    const words = text.split(/\s+/);
+    const lines = [];
+    let cur = '';
+    for (const w of words) {
+      const test = cur ? cur + ' ' + w : w;
+      if (font.widthOfTextAtSize(test, size) <= maxW) cur = test;
+      else { if (cur) lines.push(cur); cur = w; }
+    }
+    if (cur) lines.push(cur);
+    return lines;
+  }
+
+  const legalText =
+    "En signant ce formulaire, vous autorisez (A) Ten Belles Bread SAS à envoyer des " +
+    "instructions à votre banque pour débiter votre compte et (B) votre banque à débiter " +
+    "votre compte conformément aux instructions de Ten Belles Bread SAS. Vous bénéficiez " +
+    "du droit d'être remboursé par votre banque selon les conditions décrites dans la " +
+    "convention conclue avec elle. Remboursement : dans les 8 semaines pour un prélèvement " +
+    "autorisé ; au plus tard dans les 13 mois pour un prélèvement non autorisé.";
+
+  const legalLines = wrap(legalText, fR, 6.3, LEFT_W);
+
+  const meta = [
     {l:'Identifiant créancier SEPA', v:'FR15ZZZ837AAA'},
     {l:'Référence unique (RUM)',      v:d.rum},
     {l:'Créancier',                   v:'TEN BELLES BREAD SAS'},
     {l:'Adresse',                     v:'17-19 bis rue Bréguet, 75011 Paris'},
     {l:'SIRET',                       v:'817 488 943 00025'},
     {l:'TVA',                         v:'FR30817488943'},
-  ].forEach(({l,v}, i) => {
-    txt(l+':', RX, y-6-(i*13), 5.5, fR, GRAY);
-    txt(v,     RX, y-13-(i*13), 7.5, fB, INK);
+  ];
+
+  const lineH   = 8.8;
+  const metaH   = meta.length * 13 + 6;
+  const legalH  = legalLines.length * lineH + 14;
+  const BH      = Math.max(legalH, metaH, 92);
+
+  page.drawRectangle({
+    x:ML, y:y-BH, width:BW, height:BH,
+    color:OFFWH, borderColor:LGRAY, borderWidth:0.5, borderRadius:4
   });
+  page.drawLine({
+    start:{x:DIV_X, y: y-10},
+    end:  {x:DIV_X, y: y-BH+10},
+    thickness:0.3, color:LGRAY
+  });
+
+  legalLines.forEach((line, i) =>
+    txt(line, LEFT_X, y - 10 - (i*lineH), 6.3, fR, INK)
+  );
+
+  meta.forEach(({l,v}, i) => {
+    txt(l + ' :', RIGHT_X, y - 8 - (i*13), 5.3, fR, GRAY);
+    const valLines = wrap(v, fB, 7.3, RIGHT_W).slice(0, 2);
+    valLines.forEach((vl, vi) =>
+      txt(vl, RIGHT_X, y - 15 - (i*13) - (vi*7.5), 7.3, fB, INK)
+    );
+  });
+
   y -= BH + 12;
   function section(label, yy) {
     txt(label, ML, yy, 6.5, fB, GRAY);
@@ -622,7 +658,6 @@ async function buildPDF(d) {
   txt(note, MR - fR.widthOfTextAtSize(note,6), 9, 6, fR, LGRAY);
   return await doc.save();
 }
-// ── Preview ───────────────────────────────────────────────────────────────────
 async function previewPDF() {
   const d = formData();
   const pdfBytes = await buildPDF(d);
@@ -636,7 +671,6 @@ async function previewPDF() {
 function closePreview() {
   document.getElementById('previewPane').classList.remove('open');
 }
-// ── Submit → GoodSign ─────────────────────────────────────────────────────────
 async function handleSubmit() {
   if (!validate()) { window.scrollTo({top:0,behavior:'smooth'}); return; }
   const btn = document.getElementById('submitBtn');
@@ -696,7 +730,6 @@ async function handleSubmit() {
     btn.disabled = false; btn.classList.remove('loading');
   }
 }
-// ── Reset ─────────────────────────────────────────────────────────────────────
 function resetForm() {
   document.getElementById('successScreen').classList.remove('open');
   document.getElementById('mainForm').style.display = 'block';
