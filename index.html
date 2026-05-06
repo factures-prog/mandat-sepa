@@ -645,9 +645,9 @@
 
 <script>
 // ── Config ────────────────────────────────────────────────────────────────────
-// GoodSign : $1.50 par enveloppe, sans abonnement — goodsign.io
-// Récupérer la clé API dans Settings & API sur goodsign.io
-const GOODSIGN_API_KEY = 'f5f01ccf8be5a5bf9679121c5bbcec1b04bdc742c5cd0c7c85da537ac96ede10a9f8aa';
+// URL du Cloudflare Worker (à mettre à jour après déploiement)
+// Format : https://tbb-sepa.TONCOMPTE.workers.dev/send
+const WORKER_URL = 'https://tbb-sepa.factures.workers.dev/send';
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 (function init() {
@@ -977,10 +977,9 @@ async function handleSubmit() {
     formPayload.append('file', pdfBlob, filename);
     formPayload.append('payload', signerPayload);
 
-    const res = await fetch('https://goodsign.io/api/uploadpdf', {
-      method:  'POST',
-      headers: { 'authorization': `Bearer ${GOODSIGN_API_KEY}` },
-      body:    formPayload
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      body:   formPayload
     });
 
     const result = await res.json();
