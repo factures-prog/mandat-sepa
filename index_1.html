@@ -500,7 +500,8 @@ async function buildPDF(d) {
     page.drawText(String(text), {x, y, size, font, color});
   }
   function fieldBlock(label, value, x, y) {
-    txt(label.toUpperCase(), x, y + 8.5, 5.5, fR, GRAY);
+    // Label sits 11pt above value baseline so the two don't visually touch
+    txt(label.toUpperCase(), x, y + 11, 5.5, fR, GRAY);
     txt(value || '', x, y, 8, fB, INK);
   }
   // Logo (image with fallback to drawn tile)
@@ -562,10 +563,11 @@ async function buildPDF(d) {
     {l:'TVA',                         v:'FR30817488943'},
   ];
 
-  const lineH   = 8.8;
-  const metaH   = meta.length * 13 + 6;
-  const legalH  = legalLines.length * lineH + 14;
-  const BH      = Math.max(legalH, metaH, 92);
+  const lineH   = 10.5;
+  const rowH    = 17;
+  const metaH   = meta.length * rowH + 8;
+  const legalH  = legalLines.length * lineH + 16;
+  const BH      = Math.max(legalH, metaH, 100);
 
   page.drawRectangle({
     x:ML, y:y-BH, width:BW, height:BH,
@@ -578,14 +580,14 @@ async function buildPDF(d) {
   });
 
   legalLines.forEach((line, i) =>
-    txt(line, LEFT_X, y - 10 - (i*lineH), 6.3, fR, INK)
+    txt(line, LEFT_X, y - 11 - (i*lineH), 6.3, fR, INK)
   );
 
   meta.forEach(({l,v}, i) => {
-    txt(l + ' :', RIGHT_X, y - 8 - (i*13), 5.3, fR, GRAY);
+    txt(l + ' :', RIGHT_X, y - 9 - (i*rowH), 5.3, fR, GRAY);
     const valLines = wrap(v, fB, 7.3, RIGHT_W).slice(0, 2);
     valLines.forEach((vl, vi) =>
-      txt(vl, RIGHT_X, y - 15 - (i*13) - (vi*7.5), 7.3, fB, INK)
+      txt(vl, RIGHT_X, y - 17 - (i*rowH) - (vi*8), 7.3, fB, INK)
     );
   });
 
@@ -594,17 +596,17 @@ async function buildPDF(d) {
     txt(label, ML, yy, 6.5, fB, GRAY);
     page.drawLine({start:{x:ML,y:yy-4},end:{x:MR,y:yy-4},thickness:0.3,color:LGRAY});
   }
-  section('VOS COORDONNÉES', y); y -= 13;
+  section('VOS COORDONNÉES', y); y -= 18;
   fieldBlock('Raison sociale', d.company,   ML,       y);
   fieldBlock('Signataire',     d.firstName+' '+d.lastName, ML+155, y);
-  y -= 18;
+  y -= 24;
   fieldBlock('Adresse',        d.address,   ML,       y);
   fieldBlock('Code postal / Ville', (d.postal+' '+d.city).trim(), ML+155, y);
-  y -= 18;
+  y -= 24;
   fieldBlock('Pays',           d.country,   ML,       y);
-  y -= 22;
+  y -= 28;
   hline(y+4, 0.3);
-  section('COORDONNÉES BANCAIRES', y); y -= 12;
+  section('COORDONNÉES BANCAIRES', y); y -= 16;
   txt("IBAN — Numéro d'identification international du compte bancaire", ML, y+2, 6.3, fR, GRAY);
   const ibanRaw = (d.iban||'').replace(/\s/g,'');
   const chunks  = [];
